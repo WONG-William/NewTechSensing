@@ -1,0 +1,102 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Constrained Optimization: Lagrange Duality}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Constrained Optimization: Lagrange Duality}
+	\small
+	\begin{itemize}
+		\item constrained optimization:
+			\scriptsize
+			\begin{equation*}
+				\left\{
+					\begin{aligned}
+						\min_\omega &f(\omega)\\	
+						s.t. &g_i(\omega) \leq 0, i=1,2,...,k\\
+						&h_i(\omega)=0,i=1,2,...,l
+					\end{aligned}
+				\right.
+			\end{equation*}\\
+		\item to resolve original problem, we construct the following function: 
+			\scriptsize
+			\begin{equation*}
+				\left\{
+					\begin{aligned}
+						L(\omega,\alpha,\beta)=f(\omega)
+							+\sum_{i=1}^{k}\alpha_ig_i(\omega)
+							+\sum_{j=1}^{l}\beta_jh_j(\omega)\\
+						s.t. \alpha_i \geq 0.
+					\end{aligned}
+				\right.
+			\end{equation*}\\
+		\item to resolve original problem, we construct primal problem on function $L$:\\
+			$\min_{\omega}\max_{\alpha,\beta}L(\omega,\alpha,\beta)$
+		\item and the dual problem on function $L$:\\
+			$\max_{\alpha,\beta}\min_{\omega}L(\omega,\alpha,\beta)$
+		\item optimization: the dual problem is unconstrained optimization to be resolved by GD, or at least it is easier to be resolved than original problem.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+	\small
+	\begin{itemize}
+		\item We will convert constrained optimization $\min_\omega f(\omega)$ to unconstrained optimization $\max_{\alpha,\beta}\min_{\omega}L(\omega,\alpha,\beta)$, \\which is easier resolved by GD, we will prove:
+			\begin{equation*}
+				\max_{\alpha,\beta}\min_{\omega}L(\omega,\alpha,\beta)
+				\leq
+				\min_{\omega}\max_{\alpha,\beta}L(\omega,\alpha,\beta)
+				\leq
+				\min_\omega f(\omega)
+			\end{equation*}\\
+		when the following condition (KKT condition) is held, they are equal to each other:
+			\scriptsize
+			\begin{equation*}
+				\left\{
+					\begin{aligned}
+						\alpha_ig_i(\omega) &=0, i=1,2,...,k\\
+						g_i(\omega) &\leq 0, i=1,2,...,k\\
+						\alpha_i &\geq 0, i=1,2,...,k\\
+						\frac{\partial}{\partial\omega_i}L(\omega,\alpha,\beta)&=0\\
+						\frac{\partial}{\partial\beta_i}L(\omega,\alpha,\beta)&=0, i=1,2,...,k\\
+					\end{aligned}
+				\right.
+			\end{equation*}\\
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+	\small
+	\begin{itemize}
+		\item second part:$\min_{\omega}\max_{\alpha,\beta}L(\omega,\alpha,\beta)
+				\leq
+				\min_\omega f(\omega)$\\
+			prove:\\
+			$h_i(\omega)=0$, and $\alpha_ig_i(\omega)\leq 0$\\
+			$\Rightarrow$
+			for any $\alpha$ and $\beta$, $L(\omega,\alpha,\beta) \leq  f(\omega)$
+			\\$\Rightarrow$
+			for any $\alpha$ and $\beta$, $\min_{\omega}L(\omega,\alpha,\beta) \leq  \min_{\omega}f(\omega)$
+			\\$\Rightarrow$
+			$\min_{\omega}\max_{\alpha,\beta}L(\omega,\alpha,\beta) \leq  \min_{\omega}f(\omega)$
+		\item first part:$\max_{\alpha,\beta}\min_{\omega}L(\omega,\alpha,\beta)
+				\leq
+				\min_{\omega}\max_{\alpha,\beta}L(\omega,\alpha,\beta)$
+			prove:\\
+				for any $\alpha$,$\beta$ and $\omega$, $\min_{\omega}L(\omega,\alpha,\beta)
+					 \leq L(\omega,\alpha,\beta)$
+				\\$\Rightarrow$
+					for any $\omega$, $\max_{\alpha,\beta}min_{\omega}L(\omega,\alpha,\beta) 
+					\leq \max_{\alpha,\beta}L(\omega,\alpha,\beta)$
+				\\$\Rightarrow$
+					$\max_{\alpha,\beta}\min_{\omega}L(\omega,\alpha,\beta) 
+					\leq \min_{\omega}\max_{\alpha,\beta}L(\omega,\alpha,\beta)$
+		\item
+			when KKT is held, they will be equal to each other obviously.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

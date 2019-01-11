@@ -1,0 +1,126 @@
+\ifx\allfiles\undefined
+\documentclass[11 pt,t]{beamer}
+\usetheme[
+%bullet=circle,		% Other option: square
+%bigpagenumber,		% circled page number on lower right
+%topline=true,		% colored bar at the top of the frame 
+%]{Zurich}
+
+\usetheme{metropolis}
+
+\usepackage{amsmath}
+\usepackage{fontspec,xunicode,xltxtra}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,fit,positioning,shapes,chains}
+\definecolor{yellow1}{rgb}{1,0.8,0.2}  %opening 
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\tikzset{elegant/.style={smooth,thick,samples=50,cyan}}
+\tikzset{eaxis/.style={->,>=stealth}}
+
+
+\let\oldequation=\equation
+\let\oldendequation=\endequation
+\renewenvironment{equation}{\oldequation\textstyle}{\oldendequation}
+\setitemize[1]{itemsep=5pt,partopsep=0pt,parsep=\parskip,topsep=3pt}
+%\usepackage[compatibility=false]{caption}
+%\captionsetup{font={scriptsize}}
+\setbeamerfont{caption}{size=\tiny}
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\jot}{0pt}
+\begin{document}
+\fi
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Linear Regression}
+	\small 
+	\begin{itemize}
+		\item Problem Definition\\
+			\footnotesize
+			Draw a line to fix the distribution of dots as much as possible.\\
+			If coordinates of dots are given, how to determine the optimal line?
+	\end{itemize}
+	\centering 
+	\begin{tikzpicture}
+		\begin{axis}[xlabel={$x_1$},ylabel={$x_2$},
+					]
+		\addplot[domain=0:10]
+			{3*x+1};
+		\addplot[draw=green]
+%horizontal lines, vertical lines, north east lines, north west lines, grid, crosshatch, dots, crosshatch dots, fivepointed stars, sixpointed stars, bricks, checkerboard
+			coordinates
+			{
+				(0,0)
+			};
+		\end{axis}
+	\end{tikzpicture}
+\end{frame}
+\begin{frame}
+			  \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,semithick]  
+			  \begin{axis}
+			  [
+			  title={f1 by threshold},
+			  xlabel={Threshold},
+			  ylabel={F1},
+			  xmin=0, xmax=1,
+			  ymin=0, ymax=1,
+			  xtick={0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1},
+			  ytick={0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1},
+			  legend pos=north west,
+			  ymajorgrids=true,
+			  grid style=dashed,
+			  width=15cm, height=10cm, tick align=outside, xstep=0.05,ystep=0.05
+			  ]
+\centering
+			  \addplot[green, mark=triangle*] 
+			  coordinates 
+{
+	(0.0,0.98066298342541436463)
+		(0.05,0.98066298342541436463)
+		(0.10,0.98066298342541436463)
+		(0.15,0.98066298342541436463)
+		(0.20,0.98066298342541436463)
+		(0.25,0.98066298342541436463)
+		(0.30,0.97925311203319502073)
+		(0.35,0.97783933518005540164)
+		(0.40,0.97571131158917418458)
+		(0.45,0.97499999999999999999)
+		(0.50,0.96710986703988803358)
+		(0.55,0.96202531645569620252)
+		(0.60,0.94571428571428571427)
+		(0.65,0.92262773722627737225)
+		(0.70,0.88097043214556482183)
+		(0.75,0.83596214511041009463)
+		(0.80,0.75359864521591871294)
+		(0.85,0.73212747631352282513)
+		(0.90,0.70877192982456140350)
+		(0.95,0.38316722037652270209)
+		(01.00,0.0)
+};
+\end{axis}
+\end{tikzpicture} 
+%\begin{tikzpicture}
+%     % draw the axis
+%    \draw[eaxis] (-\num,0) -- (\num,0) node[below] {$x$};
+%    \draw[eaxis] (0,-\num) -- (0,\num) node[above] {$f(x)$};
+%     % draw the function (piecewise)
+%    \draw[elegant,domain=-\num:-1/\num] plot(\x,{1/\x});
+%    \draw[elegant,domain=1/\num:\num] plot(\x,{1/\x});
+%    \draw[elegant,orange,domain=-\num:\num] plot(\x,{sin(\x r)});
+%\end{tikzpicture}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

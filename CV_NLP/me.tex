@@ -1,0 +1,330 @@
+\input{my_math_style}
+%-----------------------------------------------------------------------------
+
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Maximum Entropy}
+%-----------------------------------------------------------------------------
+\begin{frame}
+	\frametitle  \ 
+	\framesubtitle \   
+	\begin{itemize}
+		\item Maximum Likelihood solution
+		\begin{tiny}
+			\begin{table}[!hbp]
+				\caption{features and labels($x_2$ is set to be trivial)}
+				\begin{tabular}{|c|c|c|}
+				\hline
+				$y$ & $x_1$ & $x_2$ \\
+				\hline
+				no	&	sunny	&	hot \\
+				no	&	sunny	&	hot \\
+				yes	&	overcast&	hot \\
+				yes	&	rainy	&	hot \\
+				yes	&	rainy	&	hot \\
+				no	&	rainy	&	hot \\
+				yes	&	overcast&	hot \\
+				no	&	sunny	&	hot \\
+				yes	&	sunny	&	hot \\
+				yes	&	rainy	&	hot	\\
+				yes	&	sunny	&	hot	\\
+				yes	&	overcast&	hot	\\
+				yes	&	overcast&	hot	\\
+				no	&	rainy	&	hot	\\
+				\hline
+				\end{tabular}
+			\end{table} 
+			\begin{table}[!hbp]
+				\caption{probability by maximum likelihood:$y$/$x_1$}
+				\begin{tabular}{|c|c|c|c|}
+				\hline
+					&	sunny	&	rainy	&	overcast \\
+				yes	&	40\%	&	60\%	&	100\%	 \\
+				no	&	60\%	&	40\%	&	  0\%	 \\
+				\hline
+				\end{tabular}
+			\end{table} 
+		\end{tiny}
+		\item if $x_2$ is not set to trivial, Maximum Entropy is introduced as follows.
+	\end{itemize}
+\end{frame}
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Entropy and Conditional Entropy}
+\framesubtitle{basic knowledge for the original of  Maximum Entropy method}
+	\small	
+	\begin{itemize}
+		\item In information theory, Entropy is defined to measure unpredictability of random variable $X$.
+		\begin{equation}
+			H(X)=-\sum_{i=1}^{n}p(x_i)\log_2p(x_i)
+		\end{equation}
+		\item Conditional Entropy is defined as random variable of $Y$ determined by another random variable of $X$.
+		\begin{scriptsize}
+		\begin{equation}
+			\begin{aligned}{\label{H(y)}}
+			H(Y|X)&=\sum_{i=1}^{n}p(x_i)H(Y|X=x_i)\\
+				  &=-\sum_{i=1}^{n}p(x_i)\sum_{j=1}^{m}p(y_j|x_i)\log p(y_j|x_i)\\
+				  &=-\sum_{i=1}^{n}\sum_{j=1}^{m}p(x_i)p(y_j|x_i)\log p(y_j|x_i)\\
+				  &=-\sum_{x,y}p(x)p(y|x)\log p(y|x)
+%				  &=-\sum_{i=1}^{n}\sum_{j=1}^{m}p(x_i,y_j)\log p(y_j|x_i)
+			\end{aligned}
+		\end{equation}
+		\end{scriptsize}
+	\end{itemize}
+\end{frame}
+%-----------------------------------------------------------------------------
+%-----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Optimization Objective}
+\framesubtitle{normal step1: build optimization objective}
+	\begin{scriptsize}
+	\begin{itemize}
+		\item input:label vector $Y=(y_1,y_2)$ and feature vector $X=(x_1,x_2)$
+		\item output:find $p(y_1|x_1,x_2)$ and $p(y_2|x_1,x_2)$ on the objective of
+		\begin{equation}\label{maximumentropy}
+			max(H(p(Y|X)))=max(-\sum_{x,y}\widetilde{p}(x)p(y|x)\log p(y|x))
+		\end{equation}
+		\begin{equation}
+			p(y|x)\widetilde{p}({x})f_i(x,y)=\widetilde{p}(x,y)f_i(x,y)\text{, for } i=1,...,k
+		\end{equation}
+		\begin{equation}{\label{sum(p)}}
+			\sum_{y}p(y|x)=1
+		\end{equation}
+		\item in (6),$\widetilde{p}({x})$ is observed probability of $x$,$\widetilde{p}(x)p(y|x)$ is $p(y|x)$ model's probability of $(x,y)$. (6) means let entropy of model to be maximum.
+		\item in (7),$\widetilde{p}(x,y)$ is observed probability of $(x,y)$ in labeled corpus. (7) means let model's probability of $(x,y)$ to be the same to observed.
+		\item in (7),$f_i(x,y)$ is feature function, i.e. how much does $y$ is affected by $x$. If $x$ and $y$ appears at the same time $f_i(x,y)=1$, else $f_i(x,y)=0$. 
+		\item in (8),$\sum_{y}p(y|x)$ means if the same $x$ will effected different $y$, the summary of probability of $y$ must be 1. 
+	\end{itemize}
+	\end{scriptsize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\section{Lagrange Dual Problem}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Lagrange Dual Problem Optimization}
+\framesubtitle{use mathematical tool to convert constrainted to unconstrainted optimization}
+	\begin{scriptsize}
+		\begin{itemize}
+			\item Lagrange function associated with Maximum Entropy objective function is defined as
+			\begin{equation}\label{L(p)}
+				L(p(y|x),\lambda_i,\lambda_0)=H(p)+\sum_{i=1}^{k}(\lambda_if_i(x,y)(p(y|x)\widetilde{p}({x})-\widetilde{p}(x,y)))+\lambda_0(\sum_{y}p(y|x)-1)
+			\end{equation}
+			\item The stationary point of Lagrange function is the same to original Maximum Entropy objective function.
+			\begin{equation}
+				\frac{\partial{L}}{\partial{\lambda_i}}=0 \Rightarrow 
+				p(y|x)\widetilde{p}({x})f_i(x,y)=\widetilde{p}(x,y)f_i(x,y)\text{, for } i=1,...,k
+			\end{equation}  
+			\begin{equation}
+				\frac{\partial{L}}{\partial{\lambda_0}}=0 \Rightarrow
+				\sum_{y}p(y|x)=1
+			\end{equation}
+			\begin{equation}\label{p=lambda}
+				\frac{\partial{L}}{\partial{p}}=0 \Rightarrow \frac{\partial{H(p)}}{\partial{p}}=0
+			\end{equation}
+			\item from \ref{H(y)} ($H(Y|X)=-\sum_{x,y}\widetilde{p}(x)p(y|x)\log p(y|x)$), \ref{L(p)}, \ref{p=lambda}, we can have
+			\begin{equation}
+				\frac{\partial{L}}{\partial{p}}=-\widetilde{p}(x)(\log p(y|x) + 1)+\sum_{i=1}^{k}(\lambda_if_i(x,y)\widetilde{p}({x})+\lambda_0=0
+			\end{equation}
+			\begin{equation}
+				p^*(y|x)=e^{\sum_{i=1}^{k}\lambda_if_i(x,y)-\frac{\lambda_0}{\widetilde{p}(x)}-1}
+			\end{equation}
+		\end{itemize}
+	\end{scriptsize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+	\begin{scriptsize}
+		\begin{itemize}
+			\item by \ref{sum(p)}, we can remove $\lambda_0$, in the following way 
+				\begin{equation}
+					e^{\frac{\lambda_0}{\widetilde{p}(x)}+1}=\sum_{y}e^{\sum_{i=1}^{k}\lambda_if_i(x,y)}
+				\end{equation}
+				\begin{equation}\label{p}
+					\left\{
+						\begin{aligned}
+					 	&p^*(y|x)=\frac{e^{\sum_{i=1}^{k}\lambda_if_i(x,y)}}{Z(x)}\\
+						&Z(x)=\sum_{y}e^{\sum_{i=1}^{k}\lambda_if_i(x,y)}
+						\end{aligned}
+					\right.
+				\end{equation}
+				\item by \ref{p}, we have simplified $L(p(y|x),\lambda_i,\lambda_0)$ to
+				\begin{equation}\label{duality}
+					L(\lambda)=\sum_{x,y}\widetilde(p)(x)p^*(y|x)\log Z(x)-\sum_{i=1}^k\widetilde{p}(x,y)\sum_{x,y}\lambda_if_i(x,y)
+				\end{equation}
+				\item \ref{duality} is a complex function of $\lambda$, by finding the stationary point of this function we can find the possible maximum point of \ref{maximumentropy}. We can define primal problem is:
+				\begin{equation}\label{primal}
+					\left\{
+						\begin{aligned}
+							&H(p(Y|X))=-\sum_{x,y}\widetilde{p}(x)p(y|x)\log p(y|x)\\
+							&\frac{\partial{H(p)}}{\partial{p}}=0
+						\end{aligned}
+					\right.
+				\end{equation}
+		\end{itemize}
+	\end{scriptsize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+	\frametitle{Lagrange Dual Problem}
+	\framesubtitle{to understand the property of Lagrange dual function}
+	\begin{scriptsize}
+	\begin{itemize}	
+		\item General Lagrange dual problem of \ref{primal} is as follows
+		\begin{equation}
+			\left\{
+				\begin{aligned}
+					&\frac{\partial{L}}{\partial{\lambda}}=0\\
+					&L(\lambda)=\sum_{x,y}\widetilde{p}(x)p^*(y|x)\log Z(x)-\sum_{i=1}^k\widetilde{p}(x,y)\sum_{x,y}\lambda_if_i(x,y)\\
+					&p^*(y|x)=\frac{1}{Z_\lambda(x)}e^{\sum_i\lambda_if_i(x,y)}\\
+					&Z_\lambda(x)=\sum_ye^{\sum_i\lambda_if_i(x,y)}
+				\end{aligned}
+			\right.
+		\end{equation}
+		\item In our case, $\widetilde{p}(x)=1$, and $\widetilde{p}(x,y_1)=0.4$, and $\widetilde{p}(x,y_2)=0.6$, and $\lambda_1$ is for $f(y_1|x)$, and $\lambda_2$ is for $f(y_2|x)$
+		\begin{equation}\label{sample}
+			\left\{
+				\begin{aligned}
+					&Z_\lambda(x)=e^{\lambda_1}+e^{\lambda_2}\\
+					&p^*(y_{1 or 2}|x)=\frac{e^{\lambda_{1 or 2}}}{e^{\lambda_1}+e^{\lambda_2}}\\
+					&L(\lambda)=-\log(e^{\lambda_1}+e^{\lambda_2})+(0.4\lambda_1+0.6\lambda_2)\\
+					&H(p(Y|X))=-(\frac{\lambda_{1}e^{\lambda_{1}}+\lambda_{2}e^{\lambda_{2}}}{e^{\lambda_1}+e^{\lambda_2}}-\log(e^{\lambda_1}+e^{\lambda_2}))\\
+					%&\sum_{i=1}^{k}(\lambda_if_i(x,y)(p(y|x)\widetilde{p}({x})-\widetilde{p}(x,y)))=\frac{\lambda_{1}e^{\lambda_{1}}+\lambda_{2}e^{\lambda_{2}}}{e^{\lambda_1}+e^{\lambda_2}}-0.4\lambda_1-0.6\lambda_2
+				\end{aligned}
+			\right.
+		\end{equation}
+	\end{itemize}
+	\end{scriptsize}
+\end{frame}
+
+% ----------------------------------------------------------------------------
+%\begin{frame}
+%\centering 
+%	\begin{tikzpicture}
+%		\begin{axis}[xstep=0.1,ystep=0.1]
+%		\addplot3[surf,domain=0.001:1]
+%			{-ln(exp(x)+exp(y))+0.4*x+0.6*y};
+%		\end{axis}
+%	\end{tikzpicture}
+%	$\lambda(x,y)=-\log(e^x+e^y)+0.4x+0.6y$
+%\end{frame}
+%\begin{frame}
+%	\centering
+%	\begin{tikzpicture}
+%		\begin{axis}[xstep=0.1,ystep=0.1]
+%		\addplot3[surf,domain=0.001:1]
+%			{-((x*exp(x)+y*exp(y))/(exp(x)+exp(y))-ln(exp(x)+exp(y)))};
+%		\end{axis}
+%	\end{tikzpicture}
+%	$H(p)=-(\frac{x*e^x+y*e^y}{e^x+e^y}-\log(e^x+e^y))$
+%\end{frame}
+% ----------------------------------------------------------------------------
+%\begin{frame}
+%	\frametitle{Another Understanding of Lagrange Dual Function}
+%	\framesubtitle{a graphical understanding of previous sample}
+%	\begin{scriptsize}
+%	\begin{itemize}	
+%		\item $L(\lambda,x_1,x_2)=-(x_1\log(x_1)+x_2\log(x_2))+\lambda_1(x_1-0.4)+\lambda_2(x_2-0.6)$ can be seen as:\\
+%		 the maximum distance between surface of $x_1\log(x_1)+x_2\log(x_2)$ and plain of $\lambda_1(x_1-0.4)+\lambda_2(x_2-0.6)$
+%	\end{itemize}
+%	\end{scriptsize}
+%	\centering 
+%	\begin{tikzpicture}
+%		\begin{axis}[xstep=0.1,ystep=0.1]
+%		\addplot3[surf,domain=0.001:1]
+%			{x*ln(x)+y*ln(y)};
+%
+%		\addplot3[green,domain=0:1]
+%			{0.223144*(x-0.4)-0.182322*(y-0.6)};
+%		\end{axis}
+%	\end{tikzpicture}
+%\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+	\frametitle{Conjugate Function}
+	\framesubtitle{another understanding of Lagrange dual function}
+	\begin{scriptsize}
+	\begin{itemize}
+		\item From the graphical understanding of previous page, we define conjugate function as
+		\begin{equation}
+			f^*(y)=\sup_{x\in \text{dom} f(x)}(yx-f(x))
+		\end{equation}
+		\item from the definition of $f^*(y)$, we can know when $y=f'(x)$, supermum is got 
+			\begin{equation}
+				f^*(y)=yf'(x)-f(f'(x))
+			\end{equation}
+   		\item some conjugate of convex functions are as follows
+		\begin{equation}\label{conjugate}
+			\begin {aligned}
+				&f(x)=ax+b \rightarrow f^*(y)=ya-ay+b=b \\
+				&f(x)=-\log x \rightarrow f^*(y)=y(-\frac{1}{y})+\log (-\frac{1}{y})=-\log (-y)-1\\
+				&f(x)=x\log x \rightarrow f^*(y)=ye^{y-1}-e^{y-1}\log{e^y-1}=e^{y-1}
+			\end {aligned}
+		\end{equation}
+		\item use \ref{conjugate} in \ref{L(p)}, we can get Lagrange dual at once
+			\begin{equation}
+				L(\lambda)=b\sum_{i=1}^{k}{\lambda_i}-\log(\sum_{i=1}^{k}e^{\lambda_i})
+			\end{equation}
+		\item it matches the result in \ref{sample} 
+	\end{itemize}
+	\end{scriptsize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\section{Optimization Algorithm}
+% ----------------------------------------------------------------------------
+\begin{frame}
+	\frametitle{Optimization Algorithm}
+	\framesubtitle{find $\lambda$ for dual and primal problem}	
+	\begin{scriptsize}
+	\begin{itemize}
+		\item There are multiple unconstrained optimization algorithm to resolve Lagrange Dual problem $\frac{\partial L(\lambda)}{\partial \lambda}=0$
+		\item Gradient Decent Method
+		\begin{equation}
+			\left\{
+			\begin{aligned}
+			&\lambda_i^{n+1}=\lambda_i^{n}+C\Delta\lambda_i \\
+			&\Delta\lambda_i=\sum_{x,y}\widetilde{p}(x,y)f_i(x,y)-\sum_{x}\widetilde{p}(x)\sum_{y}p^*(y|x)f_i(x,y)
+			\end{aligned}
+			\right.
+		\end{equation}
+		\item GIS (Generative Iterative Scaling)
+		\begin{equation}
+			\lambda_i^{n+1}=\lambda_i^{n}+\frac{1}{C}\log\frac{\sum_{x,y}\widetilde{p}(x,y)f_i(x,y))}{\sum_{x}\widetilde{p}(x)\sum_{y}p^*(y|x)f_i(x,y)}
+		\end{equation}
+		\item IIS (Improved Iterative Scalling)
+		if $\sum_if_i(x,y)$ is constant,$\lambda_i$ is got by \ref{constant}, else by \ref{variable}
+		\begin{equation}\label{constant}
+			\lambda_i=\frac{1}{\sum_if_i(x,y)}\log\frac{\sum_{x,y}\widetilde{p}(x,y)f_i(x,y)}{\sum_{x}\widetilde{p}(x)\sum_{y}p^*(y|x)f_i(x,y)}
+		\end{equation}
+		\begin{equation}\label{variable}
+			\left\{
+			\begin{aligned}
+			&\lambda_i^{n+1}=\lambda_i^{n}+\Delta\lambda_i \\
+			&\sum_{x,y}\widetilde{p}(x,y)f_i(x,y)-\sum_{x}\widetilde{p}(x)\sum_{y}p^*(y|x)f_i(x,y)e^{\Delta\lambda_i\sum_if_i(x,y)}=0
+			\end{aligned}
+			\right.
+		\end{equation}
+		\end{itemize}
+	\end{scriptsize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\begin{equation} \alpha=arg\;
+\underset{\alpha\geq 0}{\min}h(\alpha)=arg\;\underset{\alpha\geq 0}{\min}f(x_k+\alpha d_k) \end{equation}\\
+
+\(h(\alpha)\)
+\(h'(\alpha)=\nabla f(x_k+\alpha d_k)^Td_k=0\)。\(d_k\)
+\(f(x_k)\)
+\(x_k\)
+\(h'(0)\leq 0\)
+\(\hat{\alpha}\)
+\(h'(\hat{\alpha})>0\)
+\(\alpha^{\star}\in [0,\hat{\alpha})\)
+\(h'(\alpha^{\star})=0\)
+\(\alpha^{\star}\)
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

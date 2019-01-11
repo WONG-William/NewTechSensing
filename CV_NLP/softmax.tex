@@ -1,0 +1,64 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Softmax Regression}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Softmax Regression}
+	\small
+	\begin{itemize}
+		\item hypothesis function: $h_{\theta}(x^{(i)})=[p(y^{(i)}=j)|x^{(i)},\theta]=[\frac{e^{\theta_j^Tx^{(i)}}}{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}]$ 
+		\item predict function: $p(y^{(i)}=j|x^{(i)},\theta)=\frac{e^{\theta_j^Tx^{(i)}}}{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}$\\
+		\item loss function \\
+			$L(\theta)=-\frac{1}{m}\prod_{i=1}^{m}p(y^{(i)}|x^{(i)},\theta)=\prod_{i=1}^{m}\prod_{j=1}^{k}(\frac{e^{\theta_j^Tx^{(i)}}}{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}})^{1\{y_j=1\}}$
+		\item log loss function:\\
+			$l(\theta)=-\frac{1}{m}\log L(\theta)=-\frac{1}{m}\sum_{i=1}^{m}\sum_{j=1}^{k}\log({\frac{e^{\theta_j^Tx^{(i)}}}{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}})^{1\{y_j=1\}}$\\
+			\hspace{3cm}$=-\frac{1}{m}\sum_{i=1}^{m}\sum_{j=1}^{k}{1\{y_j=1\}}\log (p(y^{(i)}=j|x^{(i)},\theta))$
+		\\${\nabla}_{\theta_j}l(\theta)=$
+				$-\frac{1}{m}\sum_{i=1}^{m}	{1\{y_j=1\}}
+						\nabla_{\theta_j}
+						(
+							\log\frac
+								{e^{\theta_j ^T x^{(i)}}}
+								{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}
+						)$\
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Derivatives}
+	\small
+	\begin{itemize}
+	\item
+		$\nabla_{\theta_j}
+			(
+				\log\frac
+					{e^{\theta_j ^T x^{(i)}}}
+					{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}
+			)$\\
+		$=\nabla_{\theta_j}	
+			(
+				\log
+					{e^{\theta_j ^T x^{(i)}}}
+				-\log
+					{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}
+			)$\\
+		$=
+				\frac{1}{e^{\theta_j ^T x^{(i)}}}
+					* e^{\theta_j ^T x^{(i)}}
+					* x^{(i)}
+				- \frac{1}{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}	
+					* {e^{\theta_j ^T x^{(i)}}}
+					* x^{(i)} $
+		$=(1-p((y^{(i)}=j)|x^{(i)}))x^{(i)}$
+	\item ${\nabla}_{\theta_j}l(\theta)=
+			-\frac{1}{m}\sum_{i=1}^{m} 
+			{1\{y_j=1\}}
+			(-1+p((y^{(i)}=j)|x^{(i)}))x^{(i)}$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

@@ -1,0 +1,238 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Neural Network}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Neural Network}
+	\small
+	\begin{itemize}
+		\item Activation Function 
+		\item Forward Propagation
+		\item Backward Propagation
+		\item Loss Function
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Activation Function}
+	\small
+	\begin{itemize}
+		\item neuron is a function, mapping from linear combination of multiple vector $x$ to a vector $y$ by some type of activation function $f$. 
+			$y=f(\theta^Tx)$ 
+		\item there are multiple types of activation functions:
+			\\sigmoid function: $f(y)=\frac{1}{1+e^{-y}}$, $f^\prime(y)=f(y)(1-f(y))$
+			\\tangent function: $f(y)=\frac{e^{y}-e^{-y}}{e^{y}+e^{-y}}$, $f^\prime(y)=1-(f(y))^2$
+			\\rectified linear unit (ReLU): $f(y)=\max(0,y)$, $f^\prime(y)=1(x>0)$
+			\\maxout: $f(y)=\max_{i=0}^{k}(y_i)$, $f^\prime(y)=1(y_i>0)$
+		\item multiple neurons connected from layer to layer, is neural network. 
+			\footnotesize
+			\\\hspace{1cm}Inside layer, neurons are not connected to each other. 
+			\\\hspace{1cm}Between adjacent layers, there are connections between neurons. 
+			\\\hspace{1cm}Between nonadjacent layers, there are not connections between neurons.
+		\item input layer doesn't have activation function, every hidden layer has an activation function, and output layer has only loss function.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Forward Propagation}
+	\small
+	\begin{itemize}
+		\item define 
+			\\\hspace{1cm}previous layer $y_{prev}=f_{prev}(\theta_{prev}^Tx_{prev})$,
+			\\\hspace{1cm}now layer $y_{now}=f_{now}(\theta_{now}^Tx_{now})$,
+			\\\hspace{1cm}next layer $y_{next}=f_{next}(\theta_{next}^Tx_{next})$
+		\item forward propagation is calculate from previous layer to now layer, and to next layer. In this way, the result of final layer $y_{final}$ is calculated.
+			\\\hspace{1cm}$x_{now}=y_{prev}$
+			\\\hspace{1cm}$x_{next}=y_{now}$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Backward Propagation}
+	\small
+	\begin{itemize}
+		\item chain rule of derivative:
+			\\$\delta_{now}=\frac{dy_{final}}{d(\theta_{now}x_{now})}$
+			\\	$=\frac{dy_{final}}{d(\theta_{next}x_{next})}\frac{d(\theta_{next}x_{next})}{d(\theta_{now}x_{now})}
+				=\frac{dy_{final}}{d(\theta_{next}x_{next})}\frac{d(\theta_{next}y_{now})}{d(\theta_{now}x_{now})}
+				=\frac{dy_{final}}{d(\theta_{next}x_{next})}\frac{\theta_{next}dy_{now}}{d(\theta_{now}x_{now})}$
+			\\$	=\frac{dy_{final}}{d(\theta_{next}x_{next})}\frac{\theta_{next}df_{now}(\theta_{now}x_{now})}{d(\theta_{now}x_{now})}
+				=\frac{dy_{final}}{d(\theta_{next}x_{next})}\frac{\theta_{next}f^\prime_{now}d(\theta_{now}x_{now})}{d(\theta_{now}x_{now})}$
+			\\$ =\frac{dy_{final}}{d(\theta_{next}x_{next})}\theta_{next}f^\prime_{now}$
+			\\$=\delta_{next}\theta_{next}f^\prime_{now}$
+		\item derivatives:
+			\\$\frac{dy_{final}}{d(\theta_{now})}
+				=\frac{dy_{final}}{d(\theta_{now}x_{now})}\frac{d(\theta_{now}x_{now})}{d\theta_{now}}
+				=\frac{dy_{final}}{d(\theta_{now}x_{now})}x_{now}$
+		\item by chain rule, we can calculate $\frac{dy_{final}}{d(\theta_{now}x_{now})}$ in backward way. And calculate $\frac{dy_{final}}{d(\theta_{now})}$ in every layer. And use loss function, GD to get optimal $\theta$ for every layer.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Loss Function}
+	\small
+	\begin{itemize}
+		\item Data Loss\\
+			\hspace{1cm}0-1 loss\\
+			\hspace{1cm}log loss\\
+			\hspace{1cm}hinge loss\\
+			\hspace{1cm}squared loss\\
+			\hspace{1cm}exponential loss
+		\item Regulation Loss\\
+			\hspace{1cm}$L_1$ norm\\
+			\hspace{1cm}$L_2$ norm
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Problem Definition}
+	\small
+	\begin{itemize}
+		\item The loss function is used to evaluate the learning target, by deriving derivative and control iterative processes. \\
+			\hspace{1cm}$L=L_{data}+L_{norm}$\\
+			\hspace{1.5cm}$=\frac{1}{N}\sum_{i=0}^N L(y^{(i)},h_{\theta}(x^{(i)})) 
+						+ \lambda L_R$
+		\item $L_{data}$ is data loss, to evaluate the classification.
+		\item $L_{regualtion}$ is regulation loss, to evaluate the complexity of model to avoiding over-fit.
+		\item actually $L$ has uniform form. Let $m_i=y^{(i)}\theta^Tx^{(i)}$, $L_i=L(m_i)$.\\
+			\hspace{1cm}$L_{data}=\frac{1}{N}\sum_{i=0}^N L(m_i)$
+		\item $h_{\theta^T}(x^{(i)})$ is called score function, comparing to hypothesis function of ML.\\
+			\hspace{1cm} $L$ is called loss function, comparing to target function of ML.\\
+			\hspace{1cm} Derivative is the same to ML.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Data Loss: 0-1 Loss}
+	\small
+	\begin{itemize}
+		\item 0-1 loss: if $y^{(i)}$ and $\theta^Tx^{(i)}$ have the same sign, $L_i=0$.\\
+			\hspace{1cm}if they have different sign, $L_i=1$, totally in the following equation:\\
+				\begin{equation}
+					L_{01}=
+					\left\{
+						\begin{aligned}
+							0, if(m\geq 0)\\
+							1, if(m < 0)
+						\end{aligned}
+					\right.
+				\end{equation}
+		\item Derivative is not analytic, so it is seldom used.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Data Loss: Log Loss}
+	\small
+	\begin{itemize}
+		\item log loss
+			$L_i=y^{(i)}\log h_{\theta}(x)+{(1-y^{(i)})}\log (1-h_{\theta}(x^{(i)}))$\\
+				\hspace{1cm}$=y^{(i)}\log \frac{1}{1+e^{-\theta ^T x}}+{(1-y^{(i)})}\log (1-\frac{1}{1+e^{-\theta ^T x}})$\\
+				\hspace{1cm}$=y^{(i)}\log \frac{1}{1+e^{-\theta ^T x}}+{(1-y^{(i)})}\log (\frac{1}{1+e^{\theta ^T x}})$\\
+				\hspace{1cm}$=\log \frac{1}{1+e^{-\widetilde{y^{(i)}}\theta ^T x}}$
+				\hspace{1cm} (when $y^{(i)}=0, \widetilde{y^{(i)}}=-1$; $y^{(i)}=1, \widetilde{y^{(i)}}=1$)	\\
+				\hspace{1cm}$=\log \frac{1}{1+e^{-m_i}}$\\
+				\hspace{1cm} softmax and logistic have the same expression.
+		\item cross entropy to data loss: $H(p,q)=-\sum_x p(x)\log q(x)$.\\
+			softmax	log loss function: 
+			$L_{data}=-\frac{1}{m}\sum_{i=1}^{m}\sum_{j=1}^{k}1\{y_j^{(i)}=1\}\log({\frac{e^{\theta_j^Tx^{(i)}}}{\sum_{l=1}^{k} e^{\theta_l ^T x^{(i)}}}})$, with $p(x)=1\{y_j=1\}$ \\
+		\item derivative\\
+		\hspace{0cm}$=-\frac{1}{m}\sum_{i=1}^{m}
+						(
+							{1\{y_j^{(i)}=1\}}
+								-\log (p(y^{(i)}=j|x^{(i)},\theta))
+						){x^{(i)}}$\\
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Data Loss: Hinge Loss}
+	\small
+	\begin{itemize}
+		\item binary classification: $L_i=max(0,1-y^{(i)}\theta^Tx^{(i)})=max(0,1-m_i)$
+		\\loss function: $L=L_{data}+\lambda L_{norm}=\frac{1}{m}\sum_{i=1}^{m}max(0,1-y^{(i)}\theta^Tx^{(i)})+\lambda L_{norm}$
+		\item multiple classification:$L_i=\sum_{j\neq y^{(i)}}^{k}
+										max(0,
+											\theta_j^Tx^{(i)}-
+											\theta_{y^{(i)}}^Tx^{(i)}+
+											\Delta)$
+		\\\hspace{3cm}or $L_i=			max(0,
+											max_{j\neq y^{(i)}}^{k}(
+											\theta_j^Tx^{(i)})-
+											\theta_{y^{(i)}}^Tx^{(i)}+
+											1)$
+		\item derivative\\
+\footnotesize
+				\begin{equation}
+					\nabla_{\theta_j} L=
+					\left\{
+						\begin{aligned}
+							1(
+								\theta_j^Tx^{(i)}
+								-\theta_{y^{(i)}}^Tx^{(i)}
+								+\Delta > 0
+							)x^{(i)}, if(j\neq y^{(i)})\\
+							-(
+								\sum_{j\neq y^{(i)}}^k
+									1(
+										\theta_j^Tx^{(i)}
+										-\theta_{y^{(i)}}^Tx^{(i)}
+										+\Delta > 0
+									)
+							)x^{(i)}, if(j= y^{(i)})
+						\end{aligned}
+					\right.
+				\end{equation}
+				\begin{equation}
+					\nabla_{\theta_j} L=
+					\left\{
+						\begin{aligned}
+							1(
+										\theta_j^Tx^{(i)}-
+										\theta_{y^{(i)}}^Tx^{(i)}+
+										1 > 0
+							)x^{(i)}, 
+								if(j\neq y^{(i)} and \theta_j^Tx^{(i)} is max)\\
+							0, if(j\neq y^{(i)} and \theta_j^Tx^{(i)} is not max)\\
+							-(
+								\sum_{j\neq y^{(i)}}^k
+									1(
+											\theta_j^Tx^{(i)}-
+											\theta_{y^{(i)}}^Tx^{(i)}+
+											1 > 0
+									)
+							)x^{(i)}, if(j= y^{(i)})
+						\end{aligned}
+					\right.
+				\end{equation}
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Data Loss: Squared Loss and Exponential Loss}
+	\small
+	\begin{itemize}
+		\item squared loss is for linear regression, $L_i=(y^{(i)}-\theta^Tx^{(i)})^2$
+		\hspace{1cm} derivative:$\nabla_{\theta_j} L=x^{(i)}$
+		\item exponential loss for boosting algorithm, $L_i=exp(-y^{(i)}\theta^Tx^{(i)})=exp(-m_i)$
+		\hspace{1cm} derivative:
+		\item all loss function is decreased by increasing x, except squared loss and 0-1 loss.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Regulation Loss}
+	\small
+	\begin{itemize}
+	\item $L_{norm}=L_p=(\sum_i|\theta_i|^p)^{\frac{1}{p}}$
+	\item $L_1=\sum_i|\theta_i|$
+	\item $L_2=(\sum_i|\theta_i|^2)^{\frac{1}{2}}$, which is the most widely used.
+	\item $L_{norm}$ should be added into the calculation of derivatives.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

@@ -1,0 +1,49 @@
+\ifx\allfiles\undefined
+\documentclass[11 pt,t]{beamer}
+\geometry{showframe,paperwidth=160mm,paperheight=120mm,margin=5mm,nohead,nofoot,nomarginpar}
+%\usetheme[
+%bullet=circle,		% Other option: square
+%bigpagenumber,		% circled page number on lower right
+%topline=true,		% colored bar at the top of the frame 
+%]{Zurich}
+
+\usetheme{metropolis}
+
+\usepackage{amsmath}
+\usepackage{fontspec,xunicode,xltxtra}
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usetikzlibrary{plotmarks}
+\usetikzlibrary{arrows,decorations.pathmorphing,backgrounds,fit,positioning,shapes,chains}
+\definecolor{yellow1}{rgb}{1,0.8,0.2}  
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\tikzset{elegant/.style={smooth,thick,samples=50,cyan}}
+\tikzset{eaxis/.style={->,>=stealth}}
+
+\let\oldequation=\equation
+\let\oldendequation=\endequation
+\renewenvironment{equation}{\oldequation\textstyle}{\oldendequation}
+\setlength{\baselineskip}{0pt}
+\renewcommand{\baselinestretch}{0pt}
+\setlength{\partopsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\itemsep}{0cm}
+\setlength{\topsep}{0cm}
+\setlength{\parskip}{0pt}
+\setlength{\lineskip}{0pt}
+%\setitemize[1]{itemsep=0pt,partopsep=0pt,parsep=\parskip,topsep=0pt}
+%%\usepackage[compatibility=false]{caption}
+%%\captionsetup{font={scriptsize}}
+\setbeamerfont{caption}{size=\tiny}
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{0pt}
+\setlength{\abovedisplayshortskip}{0pt}
+\setlength{\belowdisplayshortskip}{0pt}
+\setlength{\abovedisplayskip}{0pt}
+\setlength{\belowdisplayskip}{0pt}
+\setlength{\jot}{0pt}
+\usepackage{setspace} 
+\linespread{1.4}
+\fi

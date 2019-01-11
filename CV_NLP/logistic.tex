@@ -1,0 +1,48 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Logistic Regression}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Logistic Regression}
+	\small
+	\begin{itemize}
+		\item hypothesis function: $h_{\theta}(x)=P(y=1|x,\theta)=\frac{1}{1+e^{-\theta ^T x}}$
+		\item $g(z)=\frac{1}{1+e^{-z}}$ is logistic function or sigmoid function\\
+		      $g'(z)=((1+e^{-z})^{-1})'(e^{-z})'=((1+e^{-z})^{-2})(e^{-z})$\\
+		     \hspace{0.8cm} $=\frac{1}{1+e^{-z}}(1-\frac{1}{1+e^{-z}})=g(z)(1-g(z))$\\
+		     \hspace{0.8cm}($f'(g(x))=f'(x)g'(x)$)\\
+		     \hspace{0.8cm}$g(z)$ is calculated with low cost\\
+		     $h_{\theta}(x)=g(\theta ^T x)$ 
+		\item $p(y|x,\theta)=P(y=1|x,\theta)^yP(y=0|x,\theta)^{1-y}=(h_{\theta}(x))^y(1-(h_{\theta}(x))^{1-y}$
+		\item loss function (actually it is already not loss function, but target function) by Maximum Likelihood: \\
+			$L(\theta)=\prod_{i=1}^{m}p(y^{(i)}|x^{(i)},\theta)=\prod_{i=1}^{m}(h_{\theta}(x^{(i)}))^{y^{(i)}}(1-h_{\theta}(x^{(i)}))^{1-y^{(i)}}$
+		\item log loss function:\\
+			$l(\theta)=\log L(\theta)=\sum_{i=1}^{m}(y^{(i)}\log h_{\theta}(x)+{(1-y^{(i)})}\log (1-h_{\theta}(x^{(i)})))$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Derivatives}
+	\small
+	\begin{itemize}
+		\item $\frac{\partial}{\theta_j}l(\theta)$\\
+			\hspace{0.8cm} $=\frac{\partial}{\theta_j}\sum_{i=1}^{m}(y^{(i)}\log h_{\theta}(x^{(i)})+{(1-y^{(i)})}\log (1-h_{\theta}(x^{(i)})))$\\
+			\hspace{0.8cm} $=\frac{\partial}{\theta_j}\sum_{i=1}^{m}(y^{(i)}\log g(\theta ^T x^{(i)})+{(1-y^{(i)})}\log (1-g(\theta ^T x^{(i)})))$\\
+			\hspace{0.8cm} $=\sum_{i=1}^{m}(y^{(i)}\frac{1}{g(\theta ^T x^{(i)})}+{(1-y^{(i)})}\frac{1}{(1-g(\theta ^T x^{(i)})}))\frac{\partial}{\theta_j}g(\theta ^T x^{(i)})$\\
+			\hspace{0.8cm} $=\sum_{i=1}^{m}(y^{(i)}\frac{1}{g(\theta ^T x^{(i)})}+{(1-y^{(i)})}\frac{1}{(1-g(\theta ^T x^{(i)})}))
+			g(\theta ^T x^{(i)})(1-g(\theta ^T x^{(i)}))$\\
+			\hspace{9.5cm}$\frac{\partial}{\partial{\theta_j}}(\theta ^T x^{(i)})$\\
+			\hspace{0.8cm} $=\sum_{i=1}^{m}(y^{(i)}(1-g(\theta ^T x^{(i)})-(1-y^{(i)})g(\theta ^T x^{(i)}))\frac{\partial}{\theta_j}g(\theta ^T x^{(i)})$\\
+			\hspace{0.8cm} $=\sum_{i=1}^{m}(y^{(i)}(1-g(\theta ^T x^{(i)})-(1-y^{(i)})g(\theta ^T x^{(i)})) x^{(j)}$\\
+			\hspace{0.8cm} $=\sum_{i=1}^{m}(y^{(i)}-g(\theta ^T x^{(i)})) x^{(j)}$\\
+			\hspace{0.8cm} $=\sum_{i=1}^{m}(y^{(i)}-h_{\theta}(x^{(i)})) x^{(j)}$\\
+			\hspace{0.8cm} $=x^{(j)}\sum_{i=1}^{m}(y^{(i)}-h_{\theta}(x^{(i)}))$\\
+
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

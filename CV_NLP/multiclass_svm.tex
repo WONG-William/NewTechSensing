@@ -1,0 +1,203 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Multiclass SVM}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Linear Separable Binary SVM}
+	\small
+	\begin{itemize}
+		\item hypothesis function:$h_{\theta}(x^{(i)})=\theta^Tx^{(i)}$\\
+		\item predict function:
+			\scriptsize
+			\begin{equation*}
+				y^{(i)}=
+				\left\{
+					\begin{aligned}
+						1, if(h_{\theta}(x^{(i)}) > d_1)\\
+						-1, if( h_{\theta}(x^{(i)}) < -d_2)
+					\end{aligned}
+				\right.
+			\end{equation*}\\
+		\item loss function: 
+			$L(\theta)=||\theta||^2$ subject to $y^{(i)}\theta^Tx^{(i)} \geq \min(d_1,d_2)$\\
+			(if two points $x^{(a)}$ and $x^{(b)}$ nearest to the line, loss function is geometric margin: 
+			$\frac{|\theta^Tx^{(a)}|}{||\theta||}+\frac{|\theta^Tx^{(b)}|}{||\theta||}=\frac{d_1+d_2}{||\theta||}$, $d_1+d_2$ is constant, so loss function is simplified to $\max(\frac{1}{||\theta||})$, the same to $||\theta||^2$.)
+		\item we can make $d_1=d_2=d$, and replace $\theta$ with $\frac{\theta}{d}$, the loss function is not changed, and predict function is simplified to:
+			\scriptsize
+			\begin{equation*}
+				y^{(i)}=
+				\left\{
+					\begin{aligned}
+						1, if(h_{\theta}(x^{(i)}) > 1)\\
+						-1, if( h_{\theta}(x^{(i)}) < -1)
+					\end{aligned}
+				\right.
+			\end{equation*}
+		\item optimization: This is not unconstrained optimization, can't be solved by GD, but solved by Lagrange duality and SMO. 
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Dual Problem Optimization}
+	\small
+	\begin{itemize}
+		\item add Lagrange factor to construct function:
+			\\ $L(\theta,\alpha)=\frac{1}{2}||\theta||^2-\sum_{i=1}^{m}\alpha_i(y^{(i)}\theta^Tx^{(i)}-1)$, subject to $\alpha_i \geq 0$
+		\item Primal problem is: $\min_{\theta}\max_{\alpha}L(\theta,\alpha)$ 
+		\item Dual problem is:$\max_{\alpha}\min_{\theta}L(\theta,\alpha)$
+		\item to resolve dual problem, first resolve $\min_{\theta}L(\theta,\alpha)$ by the following way:\\
+		$\nabla_{\theta}L(\theta,\alpha)=\theta-\sum_{i=1}^{m}\alpha_iy^{(i)}x^{(i)}=0$
+		so, we get $\theta=\sum_{i=1}^{m}\alpha_iy^{(i)}x^{(i)}$
+		\item The dual problem is to be:\\
+		 	$\max_{\alpha}W(\alpha)=
+				\frac{1}{2}\sum_{i,j=1}^{m}\alpha_i\alpha_jy^{(i)}y^{(j)}{x^{(i)}}^Tx^{(j)}
+					-\sum_{i,j=1}^{m}\alpha_i\alpha_jy^{(i)}y^{(j)}{x^{(i)}}^Tx^{(j)}
+					+\sum_{i=1}^{m}\alpha_i$
+			$=\sum_{i=1}^{m}\alpha_i-\frac{1}{2}\sum_{i,j=1}^{m}\alpha_i\alpha_jy^{(i)}y^{(j)}{x^{(i)}}^Tx^{(j)}$, subject to $\alpha_i \geq 0$.
+		\item This can be resolved by GD.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Nonlinear Separable Binary SVM: Kernel Trick}
+	\small
+	\begin{itemize}
+		\item The dual problem can be written into inner product manner:\\
+		 	$\max_{\alpha}W(\alpha)
+					=\sum_{i=1}^{m}\alpha
+					-\frac{1}{2}\sum_{i,j=1}^{m}\alpha_i\alpha_jy^{(i)}y^{(j)}{x^{(i)}}^Tx^{(j)}$
+					, subject to $\alpha_i \geq 0$.\\
+					$=\sum_{i=1}^{m}\alpha
+					 -\frac{1}{2}\sum_{i,j=1}^{m}\alpha_i\alpha_jy^{(i)}y^{(j)}<x^{(i)},x^{(j)}>$
+					, subject to $\alpha_i \geq 0$.\\
+		\item hypothesis function:$h_{\theta}(x^{(i)})=\theta^Tx^{(i)}$ can't separate training samples, i.e. nonlinear separable, we can consider more complex relationship between $y$ and $x$. Such as:
+				$h_{\theta}(x^{(i)})=\sum_{a,b=0}^n\theta_{a,b}x^{(i)}_ax^{(i)}_b=\theta^Tx_{trans}^{(i)}$,
+				where $n$ is dimension of $X$. 
+		\item in loss function: $<x_{trans}^{(i)},x_{trans}^{(j)}>=\sum_{a,b=0}^n(x^{(i)}_a)^2(x^{(i)}_b)^2=((x^{(i)})^T(x^{(i)}))^2$
+		\item $<x_{trans}^{(i)},x_{trans}^{(j)}>$ is calculated in time cost of $O(n)$ instead of $O(n^2)$.
+		\item This is defined as polynomial kernel: $<x_{trans}^{(i)},x_{trans}^{(j)}>=((x^{(i)})^T(x^{(j)})+c)^d$, which mapping original linear $y$ on $x$ to polynomial $y$ on $x$.
+
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Nonlinear Separable Binary SVM: Kernel Trick}
+	\small
+	\begin{itemize}
+		\item other kernel function:
+		\item Gaussian Kernel (radial basis function)
+			\\$<x_{trans}^{(i)},x_{trans}^{(j)}>=\exp -\frac{||x^{(i)}-x^{(j)}||^2}{2\sigma^2}$
+			\\which map to unlimited polynomial $y$ on $x$ by the idea of following function:
+			\\Tylor expansion $e^x=1+\frac{x}{1}+\frac{x^2}{2!}+\frac{x^3}{3!}+...,-\infty<x<\infty$
+		\item sigmoid: $<x_{trans}^{(i)},x_{trans}^{(j)}>=\tanh ((x^{(i)})^Tx^{(j)}+c)$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Nonlinear Separable Binary SVM: Soft Margin}
+	\small
+	\begin{itemize}
+		\item hypothesis function:$h_{\theta}(x^{(i)})=\theta^Tx^{(i)}$\\
+		\item predict function:
+			\begin{equation*}
+				y^{(i)}=
+				\left\{
+					\begin{aligned}
+						1, if(h_{\theta}(x^{(i)}) > 1)\\
+						-1, if( h_{\theta}(x^{(i)}) < -1)
+					\end{aligned}
+				\right.
+			\end{equation*}\\
+		\item loss function: 
+			$l(\theta)=\lambda||\theta||^2+\frac{1}{n}\sum_{i=1}^n\max(0,1-y^{(i)}\theta^tx^{(i)})$ 
+		\item derivatives:
+				\begin{equation*}
+					\nabla_{\theta_j} L=
+					\left\{
+						\begin{aligned}
+							1(
+								1
+								-y^{(i)}\theta^tx^{(i)}
+								 > 0
+							)x^{(i)}\\	
+							1(
+								1
+								-y^{(i)}\theta^tx^{(i)}
+								 < 0
+							)0
+						\end{aligned}
+					\right.
+				\end{equation*}
+		\item sometimes, to enlarge the margin we have the following loss function:\\
+			$l(\theta)=\lambda||\theta||^2+\frac{1}{n}\sum_{i=1}^n\max(0,1-y^{(i)}\theta^tx^{(i)}+\Delta)$, where $\Delta>0$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Multiclass SVM}
+	\small
+	\begin{itemize}
+		\item binary classification: $L_i=max(0,1-y^{(i)}\theta^Tx^{(i)})=max(0,1-m_i)$
+		\\loss function: $L=L_{data}+\lambda L_{norm}=\frac{1}{m}\sum_{i=1}^{m}max(0,1-y^{(i)}\theta^Tx^{(i)})+\lambda L_{norm}$
+		\item multiple classification:$L_i=\sum_{j\neq y^{(i)}}^{k}
+										max(0,
+											\theta_j^Tx^{(i)}-
+											\theta_{y^{(i)}}^Tx^{(i)}+
+											\Delta)$
+		\\\hspace{3cm}or $L_i=			max(0,
+											max_{j\neq y^{(i)}}^{k}(
+											\theta_j^Tx^{(i)})-
+											\theta_{y^{(i)}}^Tx^{(i)}+
+											1)$
+		\item derivative\\
+\footnotesize
+				\begin{equation}
+					\nabla_{\theta_j} L=
+					\left\{
+						\begin{aligned}
+							1(
+								\theta_j^Tx^{(i)}
+								-\theta_{y^{(i)}}^Tx^{(i)}
+								+\Delta > 0
+							)x^{(i)}, if(j\neq y^{(i)})\\
+							-(
+								\sum_{j\neq y^{(i)}}^k
+									1(
+										\theta_j^Tx^{(i)}
+										-\theta_{y^{(i)}}^Tx^{(i)}
+										+\Delta > 0
+									)
+							)x^{(i)}, if(j= y^{(i)})
+						\end{aligned}
+					\right.
+				\end{equation}
+				\begin{equation}
+					\nabla_{\theta_j} L=
+					\left\{
+						\begin{aligned}
+							1(
+										\theta_j^Tx^{(i)}-
+										\theta_{y^{(i)}}^Tx^{(i)}+
+										1 > 0
+							)x^{(i)}, 
+								if(j\neq y^{(i)} and \theta_j^Tx^{(i)} is max)\\
+							0, if(j\neq y^{(i)} and \theta_j^Tx^{(i)} is not max)\\
+							-(
+								\sum_{j\neq y^{(i)}}^k
+									1(
+											\theta_j^Tx^{(i)}-
+											\theta_{y^{(i)}}^Tx^{(i)}+
+											1 > 0
+									)
+							)x^{(i)}, if(j= y^{(i)})
+						\end{aligned}
+					\right.
+				\end{equation}
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

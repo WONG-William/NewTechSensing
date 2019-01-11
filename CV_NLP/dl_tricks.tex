@@ -1,0 +1,61 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Deep Learning Tricks}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Deep Learning Tricks}
+	\small
+	\begin{itemize}
+		\item Derivative Checking
+		\item Gradient Vanishing and Explosion
+		\item Data Preparation
+			\\\hspace{1cm} Mean-Subtraction and Normalization
+			\\\hspace{1cm} PCA and Whitening 
+			\\\hspace{1cm} Batch Normalization
+		\item Weight Initialization
+			\\\hspace{1cm}Pitfall: All Zero Initialization
+			\\\hspace{1cm}Small Random Numbers
+			\\\hspace{1cm}Calibrating the variances with 1/sqrt(n)
+			\\\hspace{1cm}Sparse initialization
+			\\\hspace{1cm}Xavier Initialization
+		\item Dropout
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Derivative Checking}
+	\small
+	\begin{itemize}
+		\item Check analytical derivative by numerical version. \\
+		$f^{\prime} (x)\approx \frac{f(x+h)-f(x-h)}{2h}$
+		\item why not $\frac{f(x+h)-f(x)}{h}$ but $\frac{f(x+h)-f(x-h)}{2h}$?
+		\\by Tylor expansion at $x$
+		\\$\frac{f(x+h)-f(x)}{h}=\frac{1}{h}(f^{(0)}(x)+f^{(1)}(x)h+\frac{1}{2!}f^{(2)}(x)h^2
+				+\sum_{n=3}^{\infty}\frac{1}{n!}f^{(n)}h^n-f(x))$
+			\\\hspace{1.8cm}$=\frac{1}{h}(f^{(1)}(x)h+\sum_{n=2}^{\infty}\frac{1}{n!}f^{(n)}h^n)$
+			\\\hspace{1.8cm}$=f^{(1)}(x)+\frac{1}{h}\sum_{n=2}^{\infty}\frac{1}{n!}f^{(n)}h^n)$
+		\\$\frac{f(x+h)-f(x-h)}{2h}=\frac{1}{2h}(f^{(0)}(x)+f^{(1)}(x)h+\sum_{n=2}^{\infty}\frac{1}{n!}f^{(n)}h^n$ 
+			\\\hspace{2cm}$-(f^{(0)}(x)+f^{(1)}(x)(-h)+\sum_{n=2}^{\infty}\frac{1}{n!}f^{(n)}(-h)^n))$
+			\\\hspace{2cm}$=\frac{1}{2h}(f^{(1)}(x)2h+\sum_{n=2}^{\infty}\frac{2}{(2n-1)!}f^{(2n-1)}2h^{2n-1})))$
+			\\\hspace{2cm}$=f^{(1)}(x)+\frac{1}{2h}\sum_{n=2}^{\infty}\frac{2}{(2n-1)!}f^{(2n-1)}2h^{2n-1})))$
+			\\$(\frac{f(x+h)-f(x-h)}{2h}-f^{(1)}(x))\thicksim O(h^{2n-1}) \ll  (\frac{f(x+h)-f(x)}{h}-f^{(1)}(x))\thicksim O(h^n)$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Xavier Initialization}
+	\small
+	\begin{itemize}
+		\item  In order to avoid neurons becoming too correlated and ending up in poor local minimina, it
+is often helpful to randomly initialize parameters.One of the most frequent initializations used is called
+Xavier initialization.
+		\item Given a matrix $A$ of dimension $m * n$, select values $A_{ij}$ uniformly from $[−\epsilon,\epsilon]$, where
+		\\\hspace{5cm}$\epsilon = \frac{\sqrt{6}}{\sqrt{m+n}}$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

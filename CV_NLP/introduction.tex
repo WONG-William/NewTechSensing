@@ -1,0 +1,82 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Introduction}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Introduction of Machine Learning}
+\framesubtitle{Problem Definition}
+	\small
+	\begin{itemize}
+		\item hypothesis function: $h_{\theta}:X \rightarrow Y$
+		\item loss function: $L:Y,h_{\theta}(X) \rightarrow R$, where $R$ is real number.
+		\item log loss function: $l:log(L)$ 
+		\item training set: a list of $m$ training example $\{x^{(i)},y^{(i)}\}$, $y^{(i)}$ called label of $x^{(i)}$
+		\item machine learning = training + predicting
+		\item training: try to get $\theta$ at minimum value of $L$ by using $\{x^{(i)},y^{(i)}\}$ and Convex Optimization method
+		\item predicting: use $h$ with $\theta$ to predict $y$ of unknown $x$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+% ----------------------------------------------------------------------------
+
+\begin{frame}
+\centering
+\frametitle{Core Knowledge}
+\begin{tikzpicture}
+[auto,
+decision/.style={diamond, draw=blue, thick, fill=blue!20,
+text width=4.5em,align=flush center,
+inner sep=1pt},
+block/.style ={circle, fill=yellow1,
+text width=5em,align=center, rounded corners,
+minimum size=1cm, inner sep=1, text width=1cm},
+line/.style ={draw, thick, -latex’,shorten >=2pt},
+cloud/.style ={draw=black!20, ellipse,fill=green!20,
+minimum height=2cm}, minimum width=6cm]
+%[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,semithick]  
+%\tikzstyle{every node}=[circle,fill=yellow1,text=black,align=center,minimum size=1cm,inner sep=1,text width=1cm]   
+\tiny
+%\filldraw[draw=black!20, fill=green!20, minimum size=3cm] (8,-1) ellipse (2.5 and 1);
+\node [cloud](c) at (8,-1) {};
+\node [block]                (la)    at (6.5, -1)             {linear\\algebra};  
+\node [block]                (pt)    at (8, -1)             {probability\\theory};  
+\node [block]                (co)    at (9.5, -1)             {convex\\optimization};  
+\node [block]                (lir)    at (4.5, -3)             {linear\\regression};  
+\node [block]                (lr)    at (4.5, -4.5)             {logistic\\regression};  
+\node [block]                (svm)   at (4.5, -7.5)             {SVM};
+\node [block]                (sr)    at (4.5, -6)             {softmax\\regression};  
+
+\node [block]                (nb)    at (8, -3)             {naive\\bayes};  
+\node [block]                 (em)    at (8, -4.5)             {EM};  
+\node [block]                (me)   at (8, -6)             {maximum\\entropy};
+\node [block]                (hmm)    at (8, -7.5)             {HMM};  
+
+\node [block]                (nn)    at (11.5, -3)             {neutral\\network};  
+\node [block]                (dnn)    at (11.5, -4.5)             {DNN};  
+\node [block]                (cnn)    at (11.5, -6)             {CNN};  
+\node [block]                (rnn)    at (11.5, -7.5)             {RNN};  
+
+\draw  [->] (c) to (lir);
+\draw  [->] (lir) to (lr);
+\draw  [->] (lr) to (sr);
+\draw  [->] (sr) to (svm);
+
+
+\draw  [->] (c) to (nb);
+\draw  [->] (nb) to (em);
+\draw  [->] (em) to (me);
+\draw  [->] (me) to (hmm);
+
+\draw  [->] (c) to (nn);
+\draw  [->] (nn) to (dnn);
+\draw  [->] (dnn) to (cnn);
+\draw  [->] (cnn) to (rnn);
+
+\end{tikzpicture} 
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

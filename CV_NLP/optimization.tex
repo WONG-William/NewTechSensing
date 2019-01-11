@@ -1,0 +1,261 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Unconstrained Optimization}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Unconstrained Optimization}
+	\small
+	\begin{itemize}
+		\item General Decent Method\\
+				\hspace{1cm} Random Local Search
+		\item First Order Method \\
+				\hspace{1cm} Batch Gradient Decent \\
+				\hspace{1cm} Mini Batch Gradient Decent\\
+				\hspace{1cm} Stochastic Gradient Decent (SGD)(On-line Gradient Decent)\\
+		\item Second Order Method\\
+				\hspace{1cm} Newton's Method\\
+				\hspace{1cm} Quasi-Newton's Method\\
+				\hspace{2cm} L-BFGS\\
+		\item Online Gradient Decent
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{General Decent Method: Random Local Search}
+	\small
+	\begin{itemize}
+		\item question definition: $y=f(x)$, find the minimum value of $y$.  
+		\item random change $x$ to find a better $y$ until $y$ is converged.
+		\item search direction: $\Delta x$ is random
+		\item search step: $t$ is a small value
+		\item update: $x^{(k+1)}=x^{(k)}+t\Delta x$
+		\item finish: $\Delta y < tolerance$
+		\item issue: forbid to get fake minimum $y$ by small $t\Delta x$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}[c]
+	\centering 
+	\begin{tikzpicture}
+		\begin{axis}
+			[
+				xlabel={$x$},
+				ylabel={$y$},
+			]
+		\addplot[domain=-10:10]
+			{x*x};
+		\addplot[draw=green,mark=triangle]
+			coordinates
+			{
+				(8.1,8.1*8.1)
+				(-4.6,-4.6*-4.6)
+				(2.6,2.6*2.6)
+				(-2.0,-2.0*-2.0)
+				(1.8,1.8*1.8)
+			};
+		\addplot[draw=blue,mark=triangle,only marks]
+			coordinates
+			{
+				(9,9*9)
+				(-10,100)
+				(-6,36)
+			};
+		\addplot[draw=red,mark=triangle]
+			coordinates
+			{
+				(0,0)
+			};
+		\end{axis}
+	\end{tikzpicture}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{First Order Method: Gradient Decent}
+	\small
+	\begin{itemize}
+		\item motivation:change x in the direction of gradient, which is fast to minimum.\\
+		\hspace{1cm}Assume a function can be expressed as a converged summary of a series of power series, in the adjacent domain of $x^0$, it is: \\
+		 $f(x)=f(x^0)+\frac {f^{(1)}(x^0)}{1!}(x-x^0)+\frac {f^{(2)}(x^0)}{2!}(x-x^0)^2+...+\frac {f^{(n)}(x^0)}{n!}(x-x^0)^n$\\
+		use $f(x) \approx f(x^0)+\frac {f^{(1)}(x^0)}{1!}(x-x^0)$ to get search direction, i.e. first order.
+		\item search direction: $\Delta x=f^{(1)}(x^0)=\nabla f(x^0)$
+		\item search step: $t$ is a small value
+		\item update: $x^{(k+1)}=x^{(k)}+t\nabla f(x^k)$
+		\item finish: $\nabla f(x^k)  < tolerance$
+		\item issue: how to choose $t$, please see SGD tricks. 
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}[c]
+	\centering 
+	\begin{tikzpicture}
+		\begin{axis}
+			[
+				xlabel={$x$},
+				ylabel={$y$},
+				xmin=-10,
+				xmax=10,
+				ymin=-35,
+				ymax=100,
+			]
+		\addplot[domain=-10:10]
+			{x*x};
+		\addplot[domain=-10:6]
+			{-6*(x+3)+9};
+		\addplot[draw=red,mark=triangle]
+			coordinates
+			{
+				(0,0)
+			};
+		\addplot[draw=green,mark=triangle]
+			coordinates
+			{
+				(-3,9)
+				(2.5,6.25)
+			};
+		\addplot[draw=blue,mark=triangle]
+			coordinates
+			{
+				(4,16)
+			};
+		\addplot[draw=blue,mark=none,dotted]
+			coordinates
+			{
+				(4,16)
+				(4,-33)
+			};
+		\addplot[draw=red,mark=none,dotted]
+			coordinates
+			{
+				(0,0)
+				(0,-9)
+			};
+		\addplot[draw=green,mark=none,dotted]
+			coordinates
+			{
+				(2.5,6.25)
+				(2.5,-24)
+			};
+		\end{axis}
+	\end{tikzpicture}
+	\\$f(x)=x^2$ and $y-y^0=f'(x-x^0)$
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{First Order Method: Batch Gradient Decent}
+	\small
+	\begin{itemize}
+		\item Problem Definition: Given $J_{\theta}=f(y,y^{(i)}),y=g(\theta ^Tx)$ and a training set of ${(x^{(i)},y^{(i)})}$, try to find $\theta^*$ by minimizing $J_{\theta}$
+		\item The problem is simplified to \\
+		\hspace{1cm}Minimizeing $J_{\theta}=F(\theta,x^{(i)},y^{(i)})$ for any known $(x^{(i)},y^{(i)})$ 
+		\item If find $\theta$ by $\nabla J_{\theta}=0$ we can resolve the problem. But it is difficult to find analytical $\theta$, so we use iterative algorithm to find $\nabla J_{\theta}\approx 0$.
+		\item The solution is to calculate $\nabla J_{\theta}=k(\theta,x^{(i)},y^{(i)})$ until it is converged.
+		\item From previous discussion on Gradient Decent,\\
+		\hspace{1cm} update: $\theta^{(k+1)}=\theta^{(k)}+t\nabla J_{\theta}(\theta^k)$\\
+		\hspace{1cm} finish: $\nabla J_{\theta}(\theta^k)  < tolerance$ 
+		\item Because there are multiple $(x^{(i)},y^{(i)})$, we should use the average $\nabla$ for better precision. This is Batch Gradient Decent.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{First Order Method: Stochastic Gradient Decent}
+	\small
+	\begin{itemize}
+		\item the batch stochastic gradient is summarized as:\\
+		\hspace{1cm} update: $\theta^{(k+1)}=\theta^{(k)}+t\frac{1}{n}\sum_i^n k(\theta,x^{(i)},y^{(i)})$\\
+		\hspace{1cm} finish: $\frac{1}{n}\sum_i^n k(\theta,x^{(i)},y^{(i)}) < tolerance$ 
+		\item $t$ and $tolerance$ is human chosen small value, so the above can be simplified as: \\
+		\hspace{1cm} update: $\theta^{(k+1)}=\theta^{(k)}+t\sum_i^n k(\theta,x^{(i)},y^{(i)})$\\
+		\hspace{1cm} finish: $\sum_i^n k(\theta,x^{(i)},y^{(i)}) < tolerance$ 
+		\item If we choose any $(x^{(i)},y^{(i)})$ as the representation of the average, we get Stochastic Gradient Decent:\\
+		\hspace{1cm} update: $\theta^{(k+1)}=\theta^{(k)}+tk(\theta,x^{(i)},y^{(i)})$\\
+		\hspace{1cm} finish: $|k(\theta,x^{(i)},y^{(i)})| < tolerance$ or $|y^{(k+1)}-y^{(k)}|<tolerance$
+		\item issue: there may be a random $(x^{(i)},y^{(i)})$, which makes the algorithm finish too early. 
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{First Order Method: Mini Batch Gradient Decent}
+	\small
+	\begin{itemize}
+		\item instead of using stochastic one $(x^{(i)},y^{(i)})$, but use a batch of the, we get Mini Batch Gradient Decent \\
+		\hspace{1cm} update: $\theta^{(k+1)}=\theta^{(k)}+t\frac{1}{m}\sum_i^m k(\theta,x^{(i)},y^{(i)})$\\
+		\hspace{1cm} finish: $\frac{1}{m}\sum_i^m k(\theta,x^{(i)},y^{(i)}) < tolerance$ \\
+		\hspace{1cm} $m << n$
+		\item Stochastic Gradient Decent and Mini Batch Gradient Decent are the approximation of Batch Gradient Decent. They can be converged as Batch Gradient Decent. The proof of converge is referred in paper.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Second Order Method: Newton's Method}
+	\small
+	\begin{itemize}
+		\item motivation:change x in the direction of minimum of gradient.\\
+		\hspace{1cm}Assume a function can be expressed as a converged summary of a series of power series, in the adjacent domain of $x^0$, it is: \\
+		 $f(x)=f(x^0)+\frac {f^{(1)}(x^0)}{1!}(x-x^0)+\frac {f^{(2)}(x^0)}{2!}(x-x^0)^2+...+\frac {f^{(n)}(x^0)}{n!}(x-x^0)^n$\\
+		use $f(x) \approx f(x^0)+\frac {f^{(1)}(x^0)}{1!}(x-x^0)+\frac {f^{(2)}(x^0)}{2!}(x-x^0)^2$ to get search direction, i.e. second order.
+		\item search direction: $\Delta x=\frac {f^{(1)}(x^0)}{f^{(2)}(x^0)}$ (minimum quadratic function with $-\frac{b}{2a}$)
+		\item search step: $t$ is a small value
+		\item update: $x^{(k+1)}=x^{(k)}+t\frac {f^{(1)}(x^0)}{f^{(2)}(x^0)}$
+		\item finish: $|y^{(k+1)}-y^{(k)}| < tolerance$
+		\item issue: how to choose $t$, please see SGD tricks. 
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}[c]
+	\centering 
+	\begin{tikzpicture}
+		\begin{axis}
+			[
+				xlabel={$x$},
+				ylabel={$y$},
+			]
+		\addplot[domain=-10:3]
+			{-(2*x)^3};
+		\addplot[dashed,draw=red,domain=-10:3]
+			{0};
+		\addplot[domain=-10:-5]
+			{(x+8)*(-1536)+4096};
+		\addplot[draw=red,mark=triangle]
+			coordinates
+			{
+				(0,0)
+			};
+		\addplot[draw=green,mark=triangle]
+			coordinates
+			{
+				(-8,4096)
+			};
+		\addplot[draw=green,mark=triangle]
+			coordinates
+			{
+				(-5.33333,1213.63)
+			};
+		\addplot[draw=red,mark=none,dotted]
+			coordinates
+			{
+				(0,0)
+				(0,1)
+			};
+		\addplot[draw=green,mark=none,dotted]
+			coordinates
+			{
+				(-5.33333,0)
+				(-5.33333,1213.63)
+			};
+		\addplot[draw=green,mark=none,dotted]
+			coordinates
+			{
+				(-8,0)
+				(-8,4096)
+			};
+		\end{axis}
+	\end{tikzpicture}
+	\\$f'(x)$ and $f''(x)$
+	\\$x^{(k+1)}=x^{(k)}+\frac{f'(x^{(k)})}{f''(x^{(k)})}$
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi

@@ -1,0 +1,310 @@
+\input{my_math_style}
+\ifx\allfiles\undefined
+\begin{document}
+\fi
+\section{Deep Learning for NLP}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Deep Learning for NLP}
+	\small
+	\begin{itemize}
+		\item Word Vector
+			\\\hspace{1cm} One-Hot Representation
+			\\\hspace{1cm} Distributed Representation
+				\\\hspace{2cm} Skip-Gram
+				\\\hspace{2cm} Continuous Bag of Words Model (CBOW)
+				\\\hspace{2cm} Negative Sampling
+		\item Language Model
+			\\\hspace{1cm}  Statistical Language Model
+			\\\hspace{1cm} Neural Network Language Model
+				\\\hspace{2cm} Bag-of-Words Model: Neural Network
+				\\\hspace{2cm} Sequential Models: Recurrent Neural Network (RNN) 
+				\\\hspace{2cm} Long Short Term Memory (LSTM)
+				\\\hspace{2cm} Tree Structured-Models: Recursive Neural Network (RNN)
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Skip-Gram}
+	\small
+	\begin{itemize}
+		\item One-Hot Representation	
+			$v$ = [0,0,0,...,1,...0,0,0], $v\in R^{|V|}$
+		\item Hypothesis Function \\
+			In the context of window size $2m$ of any sentence, for the center word $v_{in}$ and any context word $v_{out}$,
+			the hypothesis function is defined as:
+			\\\hspace{1cm}$p(v_{out}|v_{in})=softmax(v_{out}^Tv_{in})=\frac{\exp(v_{out}^Tv_{in})}{\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})}$
+		\item Loss Function: 
+			Maximum likelihood (cross entropy) in the window:
+			\\$L(v_{in},v_{out})=-\log \prod _{i=in-m, i\neq in}^{in+m}p(v_{i}|v_{in})
+				=-\log \prod _{i=in-m, i\neq in}^{in+m}\frac{\exp(v_{out}^Tv_{in})}{\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})}$
+		\item Gradient:for simplicity, ignore $\prod$
+			\\$L(v_{in},v_{out})=-\log\frac{\exp(v_{out}^Tv_{in})}{\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})}=-\log\exp(v_{out}^Tv_{in}) + \log\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})$ 
+		\\ \hspace{1cm}$\frac{\partial{L}}{\partial{v_{in}}}=-v_{out}+\sum_{i=1}^{|V|}(p(v_{i}|v_{in})v_{i}^T)$
+		 \\\hspace{1cm}$\frac{\partial{L}}{\partial{v_{out}}}=v_{in}^T(-1+p(v_{out}|v_{in}))$,
+		\hspace{1cm}$\frac{\partial{L}}{\partial{v_{i}}}=v_{in}^T(p(v_{i}|v_{in}))$
+		\item $\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})$ in order of $O(|V|)$, optimized by Hierarchical Softmax.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{CBOW}
+	\small
+	\begin{itemize}
+		\item Hypothesis Function \\
+			In the context of window size $2m$ of any sentence, for the center word $v_{out}$ and any context word $v_{k}$,
+			the hypothesis function is defined as:
+			\\\hspace{1cm}$v_{in}=\frac{1}{2m}\sum_{k=-m, k\neq 0}^{k=m}v_{k}$
+			\\\hspace{1cm}$p(v_{out}|v_{in})=softmax(v_{out}^Tv_{in})=\frac{\exp(v_{out}^Tv_{in})}{\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})}$
+		\item Loss Function: 
+			Maximum likelihood (cross entropy):
+			\\$L(v_{in},v_{out})=-\log p(v_{out}|v_{in})
+				=-\log \frac{\exp(v_{out}^Tv_{in})}{\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})}$
+		\item Gradient:
+			\\$L(v_{in},v_{out})=-\log\frac{\exp(v_{out}^Tv_{in})}{\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})}=-\log\exp(v_{out}^Tv_{in}) + \log\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})$ 
+		\\ \hspace{0.5cm}$\frac{\partial{L}}{\partial{v_{in}}}=(-1+\sum_{i=1}^{|V|}p(v_{out}|v_{in}))v_{out}^T$
+		 \hspace{0.5cm}$\frac{\partial{L}}{\partial{v_{out}}}=v_{in}^T(-1+p(v_{out}|v_{in}))$,
+		\\\hspace{0.5cm}$\frac{\partial{L}}{\partial{v_{i}}}=v_{in}^T(p(v_{out}|v_{in}))$
+		\hspace{2.5cm}$\frac{\partial{L}}{\partial{v_{k}}}=\frac{\partial{L}}{\partial{v_{i}}}$
+		\item $\sum_{i=1}^{|V|}\exp(v_i^Tv_{in})$ in order of $O(|V|)$, optimized by Hierarchical Softmax.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Negative Sampling}
+	\footnotesize
+	\begin{itemize}
+		\item Hypothesis Function \\
+			In the context of window size $2m$ of any sentence, for the center word $v_{in}$ and any context word $v_{out}$, and randomly select $n$ negative $v_{neg}$.
+			\\ $v_{in}$ and $v_{out}$ should in the context, while $v_{in}$ and $v_{neg}$ should not in the context.
+			the hypothesis function is defined as:
+			\\\hspace{0cm}$p(true|v_{out}^Tv_{in})=sigmoid(v_{out}^Tv_{in})=\frac{1}{1+\exp(-v_{out}^Tv_{in})}$
+			\\\hspace{0cm}$p(false|v_{neg}^Tv_{in})=1-sigmoid(v_{neg}^Tv_{in})=1-\frac{1}{1+\exp(-v_{neg}^Tv_{in})}=sigmoid(-v_{neg}^Tv_{in})$
+		\item Loss Function: 
+			Maximum likelihood (cross entropy):
+	\scriptsize
+			\\$L(v_{in},v_{out})=-\log \prod p(true|v_{out}^Tv_{in})\prod p(false|v_{neg}^Tv_{in})
+				=-\sum\log sigmoid(v_{out}^Tv_{in})-\sum \log sigmoid(-v_{neg}^Tv_{in}) 
+				=-\sum\log \sigma(v_{out}^Tv_{in})-\sum \log \sigma(-v_{neg}^Tv_{in})$ 
+	\footnotesize
+		\item Gradient:
+	\tiny
+		\\ \hspace{0cm}$\frac{\partial{L}}{\partial{v_{in}}}
+				= -\sum \sigma^ \prime(v_{out}^Tv_{in}) v_{out}^T - \sum \sigma^ \prime(v_{out}^Tv_{in}) v_{neg}^T 
+				= \sum(\sigma(v_{out}^Tv_{in})-1) v_{out}^T - \sum(\sigma(-v_{out}^Tv_{in})-1) v_{neg}^T$
+	\scriptsize
+		\\ \hspace{0cm}$\frac{\partial{L}}{\partial{v_{out}}}
+				=v_{in}^T(\sigma(v_{out}^Tv_{in})-1)$
+		\\ \hspace{0cm}$\frac{\partial{L}}{\partial{v_{neg}}}
+				=-v_{in}^T(\sigma(-v_{neg}^Tv_{in})-1)$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Language Model}
+	\scriptsize
+	\begin{itemize}
+		\item Statistical Model\\
+		\hspace{0.5cm}$p(y_m=x_1,x_2,...,x_m)=\prod_{i=1}^{i=m}p(x_i|x_1,...,x_{i-1})$
+		\\ \hspace{0.5cm}if context size is approximately limited into $n$
+		\\ \hspace{0.5cm}$p(y_m=x_1,x_2,...,x_m)\approx\prod_{i=1}^{i=m}p(x_i|x_{i-n+1},...,x_{i-1})$
+		\\\hspace{0.5cm}$x_m$ is word frequency, $\widetilde{y}_m$ is sub sentence frequency.
+		\item Neural Network Language Model: Bag-of-Words Model: Neural Network
+		\\\hspace{0.5cm}$a_h=\sum_{i=m-n}^{m+n}\omega_{hi}x_i$
+		\\\hspace{0.5cm}$b_h=f(a_h)$
+		\\\hspace{0.5cm}$p(y_m|context_n)=h(\omega_{oh}b_h)$
+		\\\hspace{0.5cm}$x_i$ is a word vector, $\widetilde{y}_m$ is a kind of semantic label such as NER.
+		\\\hspace{0.5cm}$h$ is chosen by the aim of problem, such as $softmax$ or $sigmoid$.
+		\\\hspace{0.5cm}forward pass and backward pass are general process, ignored here.
+		\item Recurrent Neural Network Model
+		\\\hspace{0.5cm}$p(y^{t_m}|x^1,x^2,...,x^{t_m})=f(x^1,x^2,...,x^{t_m})$
+		\\\hspace{0.5cm}$x^{t_m}$ is word vector, $y^{t_m}$ is $x^{t_{m+1}}$.
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Recurrent Neural Network (RNN)}
+	\scriptsize
+	\begin{itemize}
+		\item Structure: one input layer ($x_i$,$\omega_{ih}$) of $I$ dimension, one hidden layer ($\omega_{hh}$,$f$) of $H$ units, and one output layer ($\omega_{kh}$,$h$) of $K$ dimension. Key feature is hidden layer connected to itself.
+		\item forward pass:
+		\\\hspace{0.5cm}in hidden layer, $a_h^t=\sum_{i=1}^{I}\omega_{ih}x_i+
+									\sum_{h^{\prime}=1}^{H}
+										\omega_{h^{\prime}h}b_{h^{\prime}}^{t-1}$
+		\\\hspace{3cm} $b_h^t=f(a_h^t)$
+		\\\hspace{0.5cm}in output layer, $a_k^t=\sum_{h=1}^{H}\omega_{hk}b_h^t$
+		\\\hspace{3cm} $b_k^t=o(a_k^t)$
+		\item backward pass:
+		\\\hspace{0.5cm}from output to hidden layer, 
+			\\\hspace{1cm} $\delta_h^t
+							=
+							 \frac{\partial{L}}{\partial{a_k^t}}
+							 \frac{\partial{a_k^t}}{\partial{b_h^t}}
+							 \frac{\partial{b_h^t}}{\partial{a_h^t}}
+							=
+							 \delta_k^t
+							 \sum_{h=1}^{H}
+							 \omega_{hk}
+							 f^\prime(a_h^t)$
+		\\\hspace{0.5cm}from hidden to hidden layer, 
+			\\\hspace{1cm}$\delta_h^{t-1}
+								=\frac{\partial{L}}{\partial{a_h^t}}
+								 \frac{\partial{a_h^t}}{\partial{b_h^{t-1}}}
+								 \frac{\partial{b_h^{t-1}}}{\partial{a_h^{t-1}}}
+								=\delta_h^t
+								 \sum_{h^{\prime}=1}^{H}\omega_{h^{\prime}h}
+								 f^{\prime}(a_h^t)$
+		\\\hspace{0.5cm}from hidden to input layer, 
+			\\\hspace{1cm}$\delta_i^{t}
+								=\frac{\partial{L}}{\partial{a_h^t}}
+								 \frac{\partial{a_h^{t}}}{\partial{x_i^{t}}}
+								=\delta_h^t
+								 \sum_{i=1}^{I}\omega_{ih}$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Gradient Vanishing and Exploding}
+	\small
+	\begin{itemize}
+		\item gradient scale between $qt$ time stamp: 
+			\\$\frac{\partial{\delta_h^{t-1}}}{\partial{\delta_h^t}}
+				=diag(f^\prime(a_h^t))\sum_{h^{\prime}=1}^{H}\omega_{h^{\prime}h}
+				=diag(f^\prime(a_h^t))W_{h^{\prime}h}$
+			\\$\frac{\partial{\delta_h^{t-q}}}{\partial{\delta_h^t}}
+				=(\frac{\partial{\delta_h^{t-1}}}{\partial{\delta_h^t}})^q
+				=(diag(f^\prime(a_h^t))
+				\sum_{h^{\prime}=1}^{H}\omega_{h^{\prime}h})^q
+				=(diag(f^\prime(a_h^t))(W_{h^{\prime}h}))^q$
+			\\$\left|\left|W_{h^{\prime}h}\right|\right|\leq$ special radius, is unbounded.
+			\\$\left|\left|diag(f^\prime(a_h^t))\right|\right|\leq$ special radius $= \left|\max f^\prime(a_h^t)\right|$ is bounded for sigmoid and tanh.
+			\\\hspace{0.5cm}If their product is less or bigger than 1, the gradient can't backward pass through long time stamp.
+		\item gradient exploding solution
+			\\if $\left|\left|f^\prime(a_h^t)\right|\right|\left|\left|W_{h^{\prime}h}\right|\right| \geq 1$, 
+				$\frac{\partial{\delta_h^{t-q}}}{\partial{\delta_h^t}}$ will increase rapidly by the power of $q$.
+			\\solution:gradient clipping
+			\\\hspace{0.5cm}if $\left|gradient\right|\geq threshold$, $gradient=\frac{threshold}{\left|gradient\right|}gradient$
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Long Short Term Memory (LSTM)}
+	\begin{itemize}
+		\tiny
+		\item in hidden layer, to avoid gradient vanishing add memory cell $c$. to avoid confilicating of keep and discard input and output information add \textcolor{green}{input gate} $\iota$, \textcolor{blue}{output gate} $\omega$. to avoid unlimited increasing of $c$, add \textcolor{red}{forget gate} $\phi$. to increase model accuracy, add \textcolor{orange}{peepholes} to new added gates.
+		\scriptsize
+		\item hidden layer input
+		$a_h^t=\sum_{i=1}^{I}\omega_{ih}x_i+
+									\sum_{h^{\prime}=1}^{H}
+										\omega_{h^{\prime}h}b_{h}^{t-1}$ (the same to RNN)
+		\item input gate
+		\\$a_{\iota}^t=\sum_{i=1}^I\omega_{i\iota}x_i^t
+						+\sum_{h=1}^{H}\omega_{h\iota}b_h^{t-1}
+						+\textcolor{orange}{\sum_{c=1}^{C}\omega_{c\iota}s_c^{t-1}}$
+		\\$\textcolor{green}{b_{\iota}^t}=f(a_{\iota}^t)$
+		\item forget gate
+		\\$a_{\phi}^t=\sum_{i=1}^I\omega_{i\phi}x_i^t
+						+\sum_{h=1}^{H}\omega_{h\phi}b_h^{t-1}
+						+\textcolor{orange}{\sum_{c=1}^{C}\omega_{c\iota}s_c^{t-1}}$
+		\\$\textcolor{red}{b_{\phi}^t}=f(a_{\phi}^t)$
+		\item memory cell
+		$s_c^t=\textcolor{red}{b_{\phi}^t}s^{t-1}+\textcolor{green}{b_{\iota}^t}g(a_h^t)$
+		\item output gate (almost the same to input gate except peephole)
+		\\$a_{\omega}^t=\sum_{i=1}^I\omega_{i\omega}x_i^t
+						+\sum_{h=1}^{H}\omega_{h\omega}b_h^{t-1}
+						+\textcolor{orange}{\sum_{c=1}^{C}\omega_{c\iota}s_c^{t}}$
+		\\$\textcolor{blue}{b_{\omega}^t}=f(a_{\omega}^t)$
+		\item hidden layer output
+		$b_h^t=\textcolor{blue}{b_{\omega}^t}h(s_c^t)$
+		\item in output layer, $a_k^t=\sum_{h=1}^{H}\omega_{hk}b_h^t$,
+		$b_k^t=o(a_k^t)$ (the same to RNN)
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Gradient in LSTM}
+	\scriptsize
+	\begin{itemize}
+%		\item from output to hidden layer: 
+%			 				$\delta_k^t
+%							 =\frac{\partial{L}}{\partial{a_k^t}}
+%							 \frac{\partial{a_k^t}}{\partial{b_h^t}}
+%							 \frac{\partial{b_h^t}}{\partial{a_h^t}}
+%							=
+%							 \delta_k^t
+%							 \sum_{h=1}^{H}
+%							 \omega_{hk}
+%							 f^\prime(a_h^t)$
+		\item output gate: $\delta_{\omega}^{t}
+								=\frac{\partial{L}}{\partial{a_{\omega}^t}}
+								=\frac{\partial{L}}{\partial{a_{k}^t}}
+								 \frac{\partial{a_k^t}}{\partial{b_{h}^t}}
+								 \frac{\partial{b_{h}^t}}{\partial{b_{\omega}^t}}
+								 \frac{\partial{b_{\omega}^t}}{\partial{a_{\omega}^t}}
+								=\delta_k^t
+								 \sum_{h=1}^H\omega_{hk}
+								 h(s_c^t)f^{\prime}(a_{\omega}^t)$
+		\item memory cell: $\epsilon_c^t
+								=\frac{\partial{L}}{\partial{s_{c}^t}}
+								=\frac{\partial{L}}{\partial{a_{k}^t}}
+								\frac{\partial{a_{k}^t}}{\partial{b_{h}^t}}
+								\frac{\partial{b_{h}^t}}{\partial{s_{c}^t}}
+								=\delta_k^t\sum_{h=1}^{H}\omega_{hk}
+								(b_{\omega}^th^{\prime}(s_c^t)
+								+h(s_c^t)f^{\prime}(a_{\omega}^t)\sum_{c=1}^{C}\omega_{c\iota})$
+		\item input gate: $\delta_{\iota}^{t}
+								=\frac{\partial{L}}{\partial{s_{c}^t}}
+								 \frac{\partial{s_{c}^t}}{\partial{b_{\iota}^t}}
+								 \frac{\partial{b_{\iota}^t}}{\partial{a_{\iota}^t}}
+								=\epsilon_c^tg(a_h^t)f^{\prime}(a_{\iota}^t)$
+		\item forget gate: $\delta_{\phi}^{t}
+								=\frac{\partial{L}}{\partial{s_{c}^t}}
+								 \frac{\partial{s_{c}^t}}{\partial{b_{\phi}^t}}
+								 \frac{\partial{b_{\phi}^t}}{\partial{a_{\phi}^t}}
+								=\epsilon_c^ts_c^{t-1}
+								 f^{\prime}(a_{\phi}^t)$
+		\item hidden layer input: $\delta_{h}^{t}
+								=\frac{\partial{L}}{\partial{s_{c}^t}}
+								 \frac{\partial{s_{c}^t}}{\partial{a_{h}^t}}
+								=\epsilon_c^tb_{\iota}^tg^{\prime}(a_{h}^t)$
+		\item from memory cell to memory cell: 
+								\\$\frac{\partial{s_c^t}}
+									{{\partial{s_c^{t-1}}}}
+								=b_{\phi}^t 
+								 + s_c^{t-1}\frac{\partial{b_{\phi}^t}}{\partial{s_c^{t-1}}}
+								 + g(a_h^t)\frac{\partial{b_{\iota}^t}}{\partial{s_c^{t-1}}}
+								 + b_{\iota}^tg^{\prime}(a_h^t)\frac{\partial{a_h^t}}{\partial{s_c^{t-1}}}
+									$
+		\item truncated backward pass to remove cycle between memory cells: 
+								\\$\frac{\partial{a_h^t}}{\partial{b_h^{t-1}}}\approx0$,
+								$\frac{\partial{a_{\iota}^t}}{\partial{b_h^{t-1}}}\approx0$,
+								$\frac{\partial{a_{\phi}^t}}{\partial{b_h^{t-1}}}\approx0$,
+								$\frac{\partial{a_{\omega}^t}}{\partial{b_h^{t-1}}}\approx0$
+								\\i.e.
+								$\frac{\partial{a_h^t}}{\partial{s_c^{t-1}}}
+								=\frac{\partial{a_h^t}}{\partial{b_h^{t-1}}}
+								\frac{\partial{b_h^{t-1}}}{\partial{s_c^{t-1}}}\approx0$,
+								$\frac{\partial{a_{\iota}^t}}{\partial{s_c^{t-1}}}\approx0$,
+								$\frac{\partial{a_{\phi}^t}}{\partial{s_c^{t-1}}}\approx0$,
+								$\frac{\partial{a_{\omega}^t}}{\partial{s_c^{t-1}}}\approx0$
+								\\i.e.
+								$\frac{\partial{s_c^t}}
+									{{\partial{s_c^{t-1}}}}
+								\approx b_{\phi}^t 
+									$
+		\item There are only information flow to previous $t$ in cells, and decided by $b_{\phi}^t$. $b_{\phi}^t$ is decided by a factor of $x_i$ and $t$. Although it is bounded $\leq1$, information will not vanish as fast as RNN. 
+								
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\begin{frame}
+\frametitle{Recursive Neural Network (RNN)}
+	\small
+	\begin{itemize}
+		\item TBD
+	\end{itemize}
+\end{frame}
+% ----------------------------------------------------------------------------
+\ifx\allfiles\undefined
+\end{document}
+\fi
