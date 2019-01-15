@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Huang Yuefeng" />
+  <title>Build Environment: Tensorflow-GPU in Docker</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Build Environment: Tensorflow-GPU in Docker</h1>
+  <p class="author">
+Huang Yuefeng
+  </p>
+  <p class="date">2019.1.15</p>
+</div>
+<div id="difference-in-docker-installation" class="slide section level1">
+<h1>Difference in docker installation</h1>
+<p><strong>without docker, we must install:</strong></p>
+<ul>
+<li>Anaconda</li>
+<li>pip install tensorflow-gpu</li>
+<li>CUDA</li>
+<li>cudnn</li>
+<li>Nvidia Driver</li>
+</ul>
+<p><strong>with docker, we just need to install:</strong></p>
+<ul>
+<li>Nvidia Driver</li>
+<li><strong>docker</strong></li>
+<li>Nvidia docker</li>
+<li>Tensorflow-GPU image</li>
+</ul>
+</div>
+<div id="installation-docker" class="slide section level1">
+<h1>Installation docker</h1>
+<ul>
+<li><p>Disable ubuntu nouveau driver by</p>
+<pre><code>sudo ubuntu-drivers autoinstall</code></pre></li>
+<li><p>Install docker of corresponding version</p>
+<pre><code>sudo apt-get install docker-ce=18.09.0~ce~3-0~ubuntu</code></pre></li>
+<li><p>Install Nvidia docker</p>
+<pre><code>sudo apt-get install -y nvidia-docker2</code></pre></li>
+<li><p>Get Tensorflow-GPU image</p>
+<pre><code>sudo docker pull tensorflow/tensorflow:devel-gpu</code></pre></li>
+</ul>
+</div>
+<div id="appendix" class="slide section level1">
+<h1>Appendix</h1>
+</div>
+<div id="set-static-ip-for-wifi-connected-pc" class="slide section level1">
+<h1>Set Static IP for WiFi connected PC</h1>
+<pre><code>network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    #network card identification
+    wlx002127b8ee7a:
+      dhcp4: no
+      #IP/net mask by &quot;ip a&quot;
+      addresses: [192.168.50.169/24]
+      #gateway by &quot;route -n&quot;
+      gateway4: 192.168.50.1
+      nameservers:
+        #use gateway as nameserver proxy by &quot;nmcli dev show | grep DNS&quot;
+        addresses: [192.168.50.1]</code></pre>
+</div>
+<div id="docker-tips" class="slide section level1">
+<h1>Docker Tips</h1>
+<pre><code>docker pull
+docker commit 
+docker run -it
+docker start
+docker attach
+docker rm
+docker ps -a
+docker cp</code></pre>
+</div>
+</body>
+</html>
