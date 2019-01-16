@@ -7,7 +7,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
   <meta name="author" content="Huang Yuefeng" />
-  <title>Build Environment: Tensorflow-GPU in Docker</title>
+  <title>Tensorflow-GPU in Docker</title>
   <style type="text/css">code{white-space: pre;}</style>
   <link rel="stylesheet" type="text/css" media="screen, projection, print"
     href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="slide titlepage">
-  <h1 class="title">Build Environment: Tensorflow-GPU in Docker</h1>
+  <h1 class="title">Tensorflow-GPU in Docker</h1>
   <p class="author">
 Huang Yuefeng
   </p>
@@ -32,7 +32,7 @@ Huang Yuefeng
 <li>cudnn</li>
 <li>Nvidia Driver</li>
 </ul>
-<p><strong>with docker, we just need to install:</strong></p>
+<p><strong>with docker, we need to install, and we can deploy it anywhere:</strong></p>
 <ul>
 <li>Nvidia Driver</li>
 <li><strong>docker</strong></li>
@@ -43,14 +43,49 @@ Huang Yuefeng
 <div id="installation-docker" class="slide section level1">
 <h1>Installation docker</h1>
 <ul>
-<li><p>Disable ubuntu nouveau driver by</p>
-<pre><code>sudo ubuntu-drivers autoinstall</code></pre></li>
+<li><p>Install Nvidia Driver</p>
+<pre><code>sudo apt-get purge nvidia driver-* cuda-* nvidia-docker2
+sudo add-apt-repository ppa:graphics-drivers/ppa
+sudo apt-get update
+sudo apt install nvidia-driver-410
+sudo reboot</code></pre></li>
 <li><p>Install docker of corresponding version</p>
-<pre><code>sudo apt-get install docker-ce=18.09.0~ce~3-0~ubuntu</code></pre></li>
+<pre><code>sudo apt-get remove docker docker-engine docker.io containerd runc
+sudo apt-get update
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository \
+   &quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable&quot;
+sudo apt-get update
+sudo apt-get install docker-ce=5:18.09.0~3-0~ubuntu-bionic  
+sudo docker container run hello-world</code></pre></li>
+</ul>
+</div>
+<div class="slide section level1">
+
+<ul>
 <li><p>Install Nvidia docker</p>
-<pre><code>sudo apt-get install -y nvidia-docker2</code></pre></li>
+<pre><code>docker volume ls -q -f driver=nvidia-docker | xargs -r -I{} -n1 docker ps -q -a -f volume={} | xargs -r docker rm -f
+sudo apt-get purge -y nvidia-docker
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | \
+sudo apt-key add - distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | \
+sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt-get update
+    sudo apt-get install -y nvidia-docker2
+sudo pkill -SIGHUP dockerd
+docker run --runtime=nvidia --rm nvidia/cuda:9.0-base nvidia-smi</code></pre></li>
 <li><p>Get Tensorflow-GPU image</p>
-<pre><code>sudo docker pull tensorflow/tensorflow:devel-gpu</code></pre></li>
+<pre><code>sudo docker pull tensorflow/tensorflow:latest-gpu</code></pre>
+<p>sudo docker run --runtime=nvidia -it --rm tensorflow/tensorflow:latest-gpu python -c &quot;import tensorflow as tf; tf.enable_eager_execution(); print(tf.reduce_sum(tf.random_normal([1000, 1000])))&quot;</p></li>
 </ul>
 </div>
 <div id="appendix" class="slide section level1">
