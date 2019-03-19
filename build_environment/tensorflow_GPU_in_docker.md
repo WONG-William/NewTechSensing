@@ -104,3 +104,6 @@ docker rm
 docker ps -a
 docker cp
 ```
+# Remote SSH 
+ssh -p 46265 huangyf@103.46.128.49
+
